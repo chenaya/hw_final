@@ -32,36 +32,36 @@ export default function HomeScreen(props) {
 
     }
 
-    // const fetchData = () => {
-    //     const REQUEST_URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json'
-
-    //     fetch(REQUEST_URL)
-    //         .then((response) => response.json())
-    //         .then((responseData) => {
-    //             setData(responseData)
-    //         })
-    //         .catch((err) => {
-    //             console.log('error 是 ', err)
-    //         })
-    // }
-
     const fetchData = () => {
-        const REQUEST_URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json';
+        const REQUEST_URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json'
 
         fetch(REQUEST_URL)
             .then((response) => response.json())
             .then((responseData) => {
-                // 在每筆資料中加上預設欄位 addToMyList: false
-                const processedData = responseData.map(item => ({
-                    ...item,
-                    addToMyList: false,
-                }));
-                setData(processedData);
+                setData(responseData)
             })
             .catch((err) => {
-                console.log('fetch error:', err);
-            });
-    };
+                console.log('error 是 ', err)
+            })
+    }
+
+    // const fetchData = () => {
+    //     const REQUEST_URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json';
+
+    //     fetch(REQUEST_URL)
+    //         .then((response) => response.json())
+    //         .then((responseData) => {
+    //             // 在每筆資料中加上預設欄位 addToMyList: false
+    //             const processedData = responseData.map(item => ({
+    //                 ...item,
+    //                 addToMyList: false,
+    //             }));
+    //             setData(processedData);
+    //         })
+    //         .catch((err) => {
+    //             console.log('fetch error:', err);
+    //         });
+    // };
 
 
     const showNoticeDetail = (cases) => {
@@ -85,62 +85,19 @@ export default function HomeScreen(props) {
 
     }
 
-    // const renderBook = (cases) => {
-    //     return (
-    //         <TouchableOpacity onPress={() => showNoticeDetail(cases)}>
-    //             <View>
-
-    //                 <View style={styles.MainView}>
-    //                     <View style={{ flex: 1 }}>
-
-    //                         <Text style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
-    //                             場站：{cases.sna}{"\n"}
-    //                             目前可借車數：{cases.available_rent_bikes}{"\n"}
-    //                             目前還車空位：{cases.available_return_bikes}{"\n"}
-    //                         </Text>
-
-    //                         <Text style={{ marginTop: 8, fontSize: 13, marginBottom: 8, color: 'gray' }}>
-    //                             YouBike2.0系統發布資料更新的時間：{cases.srcUpdateTime}
-    //                         </Text>
-    //                     </View>
-
-    //                     {/* <CheckBox
-    //                         value={checkedItems[cases.sno] || false}  // 使用每個站點的 `sno` 作為鍵值
-    //                         onValueChange={() => toggleCheckbox(cases.sno)}  // 點擊勾選框切換狀態
-    //                         style={styles.checkbox}
-    //                     /> */}
-    //                     {/* <CheckBox
-    //                         value={isSelected}
-    //                         onValueChange={setSelection}
-    //                         style={styles.checkbox}
-    //                     /> */}
-    //                     <CheckBox
-    //                         value={isChecked}
-    //                         onValueChange={handleValueChange}
-    //                     />
-    //                 </View>
-    //                 <View style={styles.seperator} />
-
-    //             </View>
-    //         </TouchableOpacity>
-
-    //     )
-
-    // }
-
     const renderBook = (cases) => {
         return (
             <TouchableOpacity onPress={() => showNoticeDetail(cases)}>
                 <ListItem bottomDivider containerStyle={{ alignItems: 'flex-start' }}>
                     <ListItem.Content>
-                        <ListItem.Title style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
+                        <ListItem.Title style={{ color: 'black', fontSize: 14, marginTop: 8 }}>
                             場站：{cases.sna}{"\n"}
                             目前可借車數：{cases.available_rent_bikes}{"\n"}
                             目前還車空位：{cases.available_return_bikes}
                         </ListItem.Title>
 
-                        <ListItem.Subtitle style={{ marginTop: 8, fontSize: 13, color: 'gray' }}>
-                            YouBike2.0系統發布資料更新的時間：{cases.srcUpdateTime}
+                        <ListItem.Subtitle style={{ marginTop: 8, fontSize: 12, color: 'gray' }}>
+                            系統資料更新的時間：{cases.srcUpdateTime}
                         </ListItem.Subtitle>
                     </ListItem.Content>
 
@@ -150,6 +107,28 @@ export default function HomeScreen(props) {
                     />
 
                 </ListItem>
+                {/* <ListItem
+                    bottomDivider
+                    containerStyle={{ alignItems: 'flex-start', backgroundColor: '#f0f0f0', padding: 10 }}
+                >
+                    <ListItem.Content>
+                        <ListItem.Title style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
+                            場站：{cases.sna}{"\n"}
+                            可借：{cases.available_rent_bikes}{"\n"}
+                            可還：{cases.available_return_bikes}
+                        </ListItem.Title>
+
+                        <ListItem.Subtitle style={{ marginTop: 8, fontSize: 13, color: 'gray' }}>
+                            更新時間：{cases.srcUpdateTime}
+                        </ListItem.Subtitle>
+                    </ListItem.Content>
+
+                    <CheckBox
+                        checked={cases.addToMyList === true}
+                        onPress={() => pressRow(cases)}
+                    />
+                </ListItem> */}
+
             </TouchableOpacity>
         );
     };
@@ -172,9 +151,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
+        paddingHorizontal: 10,
+        paddingTop: 20,
     },
     MainView: {
         flexDirection: 'row',
