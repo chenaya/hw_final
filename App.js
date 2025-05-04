@@ -39,8 +39,8 @@ function MyProfileStack() {
         headerTintColor: 'white'
       }}
     >
-      <Stack.Screen name="Profile" component={ProfileScreen} />
-      <Stack.Screen name="ProfileDetailScreen" component={ProfileDetailScreen} options={{ title: 'My Profile Detail' }} />
+      <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'YouBike2.0臺北市公共自行車即時資訊' }} />
+      < Stack.Screen name="ProfileDetailScreen" component={ProfileDetailScreen} options={{ title: '詳細資訊' }} />
     </Stack.Navigator>
   )
 }
@@ -52,6 +52,7 @@ export default function App() {
       <Tab.Navigator
         initialRouteName='Home' //第一個顯示的tab
         screenOptions={({ route }) => ({ //route路徑，寫邏輯用{}包起來
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => { //focused：點選前後icon不同
             let iconName //提出共同的 程式碼比較簡潔
             if (route.name == 'Home') {
@@ -80,17 +81,6 @@ export default function App() {
   );
 }
 
-
-// export default function App() {
-//   return (
-//     <NavigationContainer>
-//       <Stack.Navigator initialRouteName="Home">
-//         {/* 只設置一個 Screen，即只顯示 HomeScreen */}
-//         <Stack.Screen name="Home" component={HomeScreen} />
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   );
-// }
 
 const styles = StyleSheet.create({
   container: {
