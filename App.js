@@ -19,12 +19,12 @@ function MyHomeStack() {
       screenOptions={{
         headerStyle: { backgroundColor: 'tomato' },
         headerBackTitle: '返回',
-        headerTintColor: 'white'
+        headerTintColor: 'white',
       }}
     >
       {/* name的值會影響邏輯，但不會影響UI */}
-      <Stack.Screen name="Home" component={HomeScreen} options={{ title: '水果大特賣' }} />
-      <Stack.Screen name="HomeDetailScreen" component={HomeDetailScreen} options={{ title: '購物車' }} />
+      <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'YouBike2.0臺北市公共自行車即時資訊' }} />
+      <Stack.Screen name="HomeDetailScreen" component={HomeDetailScreen} options={{ title: '詳細資訊' }} />
     </Stack.Navigator>
   )
 }
@@ -56,14 +56,15 @@ export default function App() {
           tabBarIcon: ({ color, focused }) => { //focused：點選前後icon不同
             let iconName //提出共同的 程式碼比較簡潔
             if (route.name == 'Home') {
-              iconName = focused ? 'basket' : 'cart'
+              // iconName = focused ? 'list-box' : 'list'
+              iconName = 'list'
               return <Ionicons name={iconName} size={25} color={color} />
             } else if (route.name == 'Profile') {
-              iconName = focused ? 'battery-full' : 'battery-dead'
+              // iconName = focused ? 'battery-full' : 'battery-dead'
               //focused 是一個布林值，表示該 tab 是否被選中
               //如果 focused 是 true，iconName 會被設定為 'ios-options'
               //如果 focused 是 false，iconName 會被設定為 'ios-list'
-
+              iconName = 'options'
               return <Ionicons name={iconName} size={25} color={color} />
             }
 

@@ -1,68 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, } from 'react-native';
+import * as StorageHelper from '../helpers/StorageHelper';
+
 
 export default function ProfileScreen(props) {
-    const [data, setData] = useState([])
+    const [myListCount, setMyListCount] = useState(0)
+    const [myListName, setMyListName] = useState([])
 
     useEffect(() => {
-        fetchData()
+        // 監聽動作
+        const unsubscribe = props.navigation.addListener('focus', () => {
+            loadStorage()
+        })
+        return unsubscribe
+
     }, [])
 
-    const fetchData = () => {
-        const REQUEST_URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json'
+    useEffect(() => {
+        console.log('myListName updated:', myListName);
+    }, [myListName]);
 
-        fetch(REQUEST_URL)
-            .then((response) => response.json())
-            .then((responseData) => {
-                setData(responseData)
-            })
-            .catch((err) => {
-                console.log('error 是 ', err)
-            })
+
+    const loadStorage = async () => {
+        let listGet = await StorageHelper.getMySetting('myList')
+
+        // 法ㄧ
+        // let a = JSON.parse(bookGet)
+        // let newArray = []
+        // a.forEach((thing) => {
+        //     newArray.push(thing.animal_colour + '的' + thing.animal_kind)
+
+        // });
+
+        // setMyBookCount(a.length)
+        // setMyBookListName(newArray)
+
+
+        if (!listGet) { //防呆
+            console.log('myList is empty');
+            setMyListCount(0);
+            setMyListName([]);
+            return;
+        }
+
+        // 法二
+        let a = JSON.parse(listGet)
+        setMyListCount(a.length)
+        setMyListName(a)
     }
 
-    const showNoticeDetail = (cases) => {
-        props.navigation.push('ProfileDetailScreen', { passProps: cases })
-
-    }
-
-    const renderBook = (cases) => {
-        return (
-            <TouchableOpacity onPress={() => showNoticeDetail(cases)}>
-                <View>
-
-                    <View style={styles.MainView}>
-                        <View style={{ flex: 1 }}>
-
-                            <Text style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
-                                場站：{cases.sna}{"\n"}
-                                目前可借車數：{cases.available_rent_bikes}{"\n"}
-                                目前還車空位：{cases.available_return_bikes}{"\n"}
-                            </Text>
-
-                            <Text style={{ marginTop: 8, fontSize: 13, marginBottom: 8, color: 'gray' }}>
-                                YouBike2.0系統發布資料更新的時間：{cases.srcUpdateTime}
-                            </Text>
-                        </View>
-
-                    </View>
-                    <View style={styles.seperator} />
-
-                </View>
-            </TouchableOpacity>
-
-        )
-
-    }
 
     return (
-        <View>
-            <FlatList
-                data={data}
-                renderItem={({ item }) => renderBook(item)}
-                keyExtractor={cases => cases.sno}
-                style={{ backgroundColor: 'white' }}
-            />
+        <View style={styles.container}>
+            <Text>ProfileScreen</Text>
+            <Text>我收藏了{myListCount}個YouBike站點</Text>
+
+            {
+                myListName.map((list, index) => {
+                    return (<Text key={index}> {index + 1}. {list.sarea + '的' + list.sna}</Text>)
+                })
+            }
         </View>
     );
 }

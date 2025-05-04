@@ -1,69 +1,172 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { ListItem, CheckBox } from 'react-native-elements';
+import * as StorageHelper from '../helpers/StorageHelper';
 
 export default function HomeScreen(props) {
-    const [fruits, setFruits] = useState([
-        { id: 'banana 🍌', price: 18, quantity: 0 },
-        { id: 'apple 🍎', price: 25, quantity: 0 },
-        { id: 'tomato 🍅', price: 22, quantity: 0 },
-    ]);
+    const [data, setData] = useState([])
 
-    const addToCart = (index) => {
-        const updatedFruits = [...fruits];
-        updatedFruits[index].quantity += 1;
-        setFruits(updatedFruits);
-    };
+    useEffect(() => {
+        fetchData()
+    }, [])
 
-    const removeFromCart = (index) => {
-        const updatedFruits = [...fruits];
-        if (updatedFruits[index].quantity > 0) {
-            updatedFruits[index].quantity -= 1;
-            setFruits(updatedFruits);
+    useEffect(() => {
+        let getAll = []
+
+        data.map(a => {
+            if (a.addToMyList === true) {
+                getAll.push(a)
+            }
+        })
+
+        saveToStorage(getAll)
+    }, [data])
+
+    const saveToStorage = async (getMyLikes) => {
+        try {
+            await StorageHelper.setMySetting('myList', JSON.stringify(getMyLikes))
+            // 'myList'=> key值
+        } catch (err) {
+            console.log(err)
         }
+
+    }
+
+    // const fetchData = () => {
+    //     const REQUEST_URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json'
+
+    //     fetch(REQUEST_URL)
+    //         .then((response) => response.json())
+    //         .then((responseData) => {
+    //             setData(responseData)
+    //         })
+    //         .catch((err) => {
+    //             console.log('error 是 ', err)
+    //         })
+    // }
+
+    const fetchData = () => {
+        const REQUEST_URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json';
+
+        fetch(REQUEST_URL)
+            .then((response) => response.json())
+            .then((responseData) => {
+                // 在每筆資料中加上預設欄位 addToMyList: false
+                const processedData = responseData.map(item => ({
+                    ...item,
+                    addToMyList: false,
+                }));
+                setData(processedData);
+            })
+            .catch((err) => {
+                console.log('fetch error:', err);
+            });
     };
 
-    const cases = ({ item, index }) => (
-        <View style={styles.foodItem}>
-            <Text style={{ fontSize: 20 }}>{item.id}</Text>
-            <Text style={{ fontSize: 16, marginHorizontal: 10 }}>${item.price}</Text>
-            <TouchableOpacity onPress={() => addToCart(index)} style={styles.cartButton}>
-                <Text style={styles.cartButtonText}>+</Text>
+
+    const showNoticeDetail = (cases) => {
+        props.navigation.push('HomeDetailScreen', { passProps: cases })
+
+    }
+
+    const pressRow = (cases) => {
+
+        const newDatas = data.map(a => {
+            let copyA = { ...a }
+            if (copyA.sno === cases.sno) {
+                copyA.addToMyList = !copyA.addToMyList
+            }
+
+            return copyA
+        }
+        )
+
+        setData(newDatas) //更新state => 觸發use effect
+
+    }
+
+    // const renderBook = (cases) => {
+    //     return (
+    //         <TouchableOpacity onPress={() => showNoticeDetail(cases)}>
+    //             <View>
+
+    //                 <View style={styles.MainView}>
+    //                     <View style={{ flex: 1 }}>
+
+    //                         <Text style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
+    //                             場站：{cases.sna}{"\n"}
+    //                             目前可借車數：{cases.available_rent_bikes}{"\n"}
+    //                             目前還車空位：{cases.available_return_bikes}{"\n"}
+    //                         </Text>
+
+    //                         <Text style={{ marginTop: 8, fontSize: 13, marginBottom: 8, color: 'gray' }}>
+    //                             YouBike2.0系統發布資料更新的時間：{cases.srcUpdateTime}
+    //                         </Text>
+    //                     </View>
+
+    //                     {/* <CheckBox
+    //                         value={checkedItems[cases.sno] || false}  // 使用每個站點的 `sno` 作為鍵值
+    //                         onValueChange={() => toggleCheckbox(cases.sno)}  // 點擊勾選框切換狀態
+    //                         style={styles.checkbox}
+    //                     /> */}
+    //                     {/* <CheckBox
+    //                         value={isSelected}
+    //                         onValueChange={setSelection}
+    //                         style={styles.checkbox}
+    //                     /> */}
+    //                     <CheckBox
+    //                         value={isChecked}
+    //                         onValueChange={handleValueChange}
+    //                     />
+    //                 </View>
+    //                 <View style={styles.seperator} />
+
+    //             </View>
+    //         </TouchableOpacity>
+
+    //     )
+
+    // }
+
+    const renderBook = (cases) => {
+        return (
+            <TouchableOpacity onPress={() => showNoticeDetail(cases)}>
+                <ListItem bottomDivider containerStyle={{ alignItems: 'flex-start' }}>
+                    <ListItem.Content>
+                        <ListItem.Title style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
+                            場站：{cases.sna}{"\n"}
+                            目前可借車數：{cases.available_rent_bikes}{"\n"}
+                            目前還車空位：{cases.available_return_bikes}
+                        </ListItem.Title>
+
+                        <ListItem.Subtitle style={{ marginTop: 8, fontSize: 13, color: 'gray' }}>
+                            YouBike2.0系統發布資料更新的時間：{cases.srcUpdateTime}
+                        </ListItem.Subtitle>
+                    </ListItem.Content>
+
+                    <CheckBox
+                        checked={cases.addToMyList === true}
+                        onPress={() => pressRow(cases)}
+                    />
+
+                </ListItem>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => removeFromCart(index)} style={styles.cartButton}>
-                <Text style={styles.cartButtonText}>-</Text>
-            </TouchableOpacity>
-            {item.quantity > 0 && (
-                <Text style={{ fontSize: 16, marginLeft: 10 }}>
-                    amounts: {item.quantity}
-                </Text>
-            )}
-        </View>
-    );
+        );
+    };
+
 
     return (
         <View style={styles.container}>
-            <Text style={{ fontSize: 30 }}></Text>
-            <Text style={{ fontSize: 35, marginTop: 35, }}>請選擇想購買的水果</Text>
-            <Text style={{ fontSize: 20 }}> </Text>
-
             <FlatList
-                data={fruits}
-                renderItem={cases}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.cart}
+                data={data}
+                renderItem={({ item }) => renderBook(item)}
+                keyExtractor={cases => cases.sno}
+                style={{ backgroundColor: 'white' }}
             />
-
-            <TouchableOpacity onPress={() => props.navigation.push('HomeDetailScreen', { fruits: fruits })}
-                style={{ backgroundColor: '#00aeef', borderRadius: 20, width: 300, height: 40, justifyContent: 'center', margin: 20, marginBottom: 50 }}>
-                <Text style={{ color: 'white', textAlign: 'center', fontSize: 20 }}>
-                    查看購物車
-                </Text>
-            </TouchableOpacity>
-
-            {/* push(頁面,值) =>傳送 */}
-        </View >
+        </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -71,30 +174,27 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: 20,
     },
-    cart: {
-        flexDirection: 'column', // 每個 foodItem 往下排
-        alignItems: 'center',
-    },
-    foodItem: {
+    MainView: {
         flexDirection: 'row',
+        // justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 15,
-        marginBottom: 10,
-        gap: 10,
-        fontSize: 30
+        backgroundColor: 'white',
+        padding: 8
     },
-    cartButton: {
-        backgroundColor: '#00aeef',
-        borderRadius: 10,
-        width: 20,
-        height: 20,
+    checkbox: {
+        marginLeft: 10,
+    },
+    buttonRow: {
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 30,
     },
-    cartButtonText: {
-        color: 'white',
-        fontSize: 14,
-        textAlign: 'center',
+    seperator: {
+        height: 1,
+        backgroundColor: '#dddddd'
     },
 });
